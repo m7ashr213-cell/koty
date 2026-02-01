@@ -38,8 +38,8 @@
         .heart {
             position: absolute;
             top: -50px;
-            color: rgba(255, 105, 180, 0.5); /* أخف شفافية */
-            font-size: 18px; /* أصغر */
+            color: rgba(255, 105, 180, 0.5);
+            font-size: 18px;
             user-select: none;
             pointer-events: none;
         }
@@ -259,7 +259,7 @@
             transition: transform 0.3s ease;
         }
         
-        /* الصورة الرئيسية - حجم 720x1280 */
+        /* الصورة الرئيسية */
         .image-item {
             position: absolute;
             width: 100%;
@@ -421,7 +421,7 @@
             </div>
             
             <div class="counter">
-                <span id="currentImage">1</span> / <span id="totalImages">19</span>
+                <span id="currentImage">1</span> / <span id="totalImages">18</span>
             </div>
             
             <div class="instructions">
@@ -459,8 +459,8 @@
         const heartsBackground = document.getElementById('hearts-background');
         const backButton = document.getElementById('backButton');
         
-        // عدد الصور
-        const TOTAL_IMAGES = 19;
+        // عدد الصور - غيرنا إلى 18 فقط
+        const TOTAL_IMAGES = 18;
         totalImagesSpan.textContent = TOTAL_IMAGES;
         
         // الصورة الحالية
@@ -469,17 +469,15 @@
         let startX = 0;
         let currentX = 0;
         let heartsInterval = null;
+        let autoSlideInterval = null;
+        let isAutoSliding = true;
+        let isUserInteracting = false;
         
-        // نظام القلوب المتساقطة - مبسط بدون animation frame
+        // نظام القلوب المتساقطة - مبسط
         function initHearts() {
-            // تنظيف أي قلوب موجودة
-            clearInterval(heartsInterval);
-            heartsBackground.innerHTML = '';
-            
-            // إنشاء قلوب بسيطة
             heartsInterval = setInterval(() => {
                 createHeart();
-            }, 800); // قللنا التكرار
+            }, 800);
         }
         
         function createHeart() {
@@ -488,17 +486,16 @@
             heart.innerHTML = '❤️';
             
             const left = Math.random() * 100;
-            const size = Math.random() * 12 + 10; // أصغر حجماً
+            const size = Math.random() * 12 + 10;
             
             heart.style.left = `${left}%`;
             heart.style.fontSize = `${size}px`;
             
             heartsBackground.appendChild(heart);
             
-            // تحريك القلب
             let top = -50;
             const speed = 0.5 + Math.random() * 0.3;
-            const duration = 10000; // 10 ثواني
+            const duration = 10000;
             
             const startTime = Date.now();
             
@@ -509,11 +506,9 @@
                 top = -50 + (progress * (window.innerHeight + 100));
                 heart.style.top = `${top}px`;
                 
-                // حركة أفقية خفيفة
                 const swing = Math.sin(progress * Math.PI * 2) * 5;
                 heart.style.transform = `translateX(${swing}px) rotate(${progress * 180}deg)`;
                 
-                // تغيير الشفافية
                 heart.style.opacity = 1 - progress * 0.8;
                 
                 if (progress < 1) {
@@ -525,7 +520,6 @@
             
             requestAnimationFrame(moveHeart);
             
-            // تنظيف الذاكرة - إزالة القلوب القديمة
             if (heartsBackground.children.length > 15) {
                 const oldHearts = heartsBackground.querySelectorAll('.heart');
                 if (oldHearts.length > 0) {
@@ -534,21 +528,37 @@
             }
         }
         
+        // نظام التمرير التلقائي
+        function startAutoSlide() {
+            if (autoSlideInterval) clearInterval(autoSlideInterval);
+            
+            autoSlideInterval = setInterval(() => {
+                if (!isUserInteracting && isAutoSliding && gallerySection.classList.contains('active')) {
+                    changeImage(1);
+                }
+            }, 2000); // كل ثانيتين
+        }
+        
+        function stopAutoSlide() {
+            if (autoSlideInterval) {
+                clearInterval(autoSlideInterval);
+                autoSlideInterval = null;
+            }
+        }
+        
         // إنشاء معرض الصور
         function createImageGallery() {
             imageStack.innerHTML = '';
             
-            // تحميل الصورة الحالية أولاً
-            loadImage(currentImageIndex);
+            // تحميل الصور من 1 إلى 18 فقط
+            for (let i = 1; i <= TOTAL_IMAGES; i++) {
+                loadImage(i);
+            }
             
-            // تحميل الصور التالية في الخلفية
-            setTimeout(() => {
-                for (let i = 1; i <= TOTAL_IMAGES; i++) {
-                    if (i !== currentImageIndex) {
-                        preloadImage(i);
-                    }
-                }
-            }, 100);
+            updateImagePosition();
+            
+            // بدء التمرير التلقائي
+            startAutoSlide();
         }
         
         // تحميل صورة واحدة
@@ -558,7 +568,6 @@
             const imageItem = document.createElement('div');
             imageItem.classList.add('image-item');
             imageItem.dataset.index = index;
-            imageItem.style.opacity = '0';
             
             const img = new Image();
             img.src = `image${index}.jpg`;
@@ -569,22 +578,31 @@
                 imageItem.appendChild(img);
                 imageStack.appendChild(imageItem);
                 
-                setTimeout(() => {
-                    imageItem.style.opacity = '1';
-                }, 50);
-                
-                updateImagePosition();
-            };
-            
-            img.onerror = function() {
-                console.log(`خطأ في تحميل الصورة ${index}`);
+                // أحداث للتوقف عند التفاعل
+                imageItem.addEventListener('touchstart', handleInteractionStart);
+                imageItem.addEventListener('mousedown', handleInteractionStart);
+                imageItem.addEventListener('touchend', handleInteractionEnd);
+                imageItem.addEventListener('mouseup', handleInteractionEnd);
+                imageItem.addEventListener('mouseleave', handleInteractionEnd);
             };
         }
         
-        // تحميل مسبق للصور
-        function preloadImage(index) {
-            const img = new Image();
-            img.src = `image${index}.jpg`;
+        // بدء التفاعل مع الصورة
+        function handleInteractionStart() {
+            isUserInteracting = true;
+            stopAutoSlide();
+        }
+        
+        // انتهاء التفاعل مع الصورة
+        function handleInteractionEnd() {
+            isUserInteracting = false;
+            
+            // إعادة تشغيل التمرير التلقائي بعد 1 ثانية من ترك المستخدم للصورة
+            setTimeout(() => {
+                if (!isUserInteracting) {
+                    startAutoSlide();
+                }
+            }, 1000);
         }
         
         // تحديث موقع الصور
@@ -627,11 +645,6 @@
                 currentImageIndex = 1;
             }
             
-            // تحميل الصورة الجديدة إذا لم تكن محملة
-            if (!document.querySelector(`.image-item[data-index="${currentImageIndex}"]`)) {
-                loadImage(currentImageIndex);
-            }
-            
             updateImagePosition();
         }
         
@@ -644,10 +657,8 @@
             if (enteredPassword === CORRECT_PASSWORD) {
                 errorMessage.style.display = 'none';
                 
-                // تحميل الصوت أولاً
                 backgroundMusic.load();
                 
-                // الانتقال للمعرض
                 loginSection.classList.add('hidden');
                 mainFrame.classList.add('gallery-active');
                 
@@ -655,7 +666,6 @@
                     gallerySection.classList.add('active');
                     createImageGallery();
                     
-                    // تشغيل الموسيقى
                     setTimeout(() => {
                         backgroundMusic.play().catch(e => {
                             console.log("سيتم تشغيل الموسيقى يدوياً");
@@ -666,7 +676,6 @@
                 errorMessage.style.display = 'block';
                 passwordInput.focus();
                 
-                // تأثير اهتزاز بسيط
                 loginForm.style.animation = 'shake 0.3s';
                 setTimeout(() => {
                     loginForm.style.animation = '';
@@ -676,6 +685,7 @@
         
         // زر العودة
         backButton.addEventListener('click', function() {
+            stopAutoSlide();
             gallerySection.classList.remove('active');
             mainFrame.classList.remove('gallery-active');
             
@@ -686,7 +696,6 @@
                 passwordInput.value = '';
                 passwordInput.focus();
                 
-                // تنظيف المعرض
                 imageStack.innerHTML = '';
             }, 300);
         });
@@ -697,8 +706,9 @@
         let isTouchDevice = 'ontouchstart' in window;
         
         if (isTouchDevice) {
-            // للجوال
             imageGallery.addEventListener('touchstart', function(e) {
+                isUserInteracting = true;
+                stopAutoSlide();
                 dragStartX = e.touches[0].clientX;
                 dragDistance = 0;
             });
@@ -710,16 +720,23 @@
             imageGallery.addEventListener('touchend', function() {
                 if (Math.abs(dragDistance) > 50) {
                     if (dragDistance > 0) {
-                        changeImage(-1); // يمين - الصورة السابقة
+                        changeImage(-1);
                     } else {
-                        changeImage(1); // يسار - الصورة التالية
+                        changeImage(1);
                     }
                 }
                 dragDistance = 0;
+                
+                // إعادة التشغيل بعد ثانية
+                setTimeout(() => {
+                    isUserInteracting = false;
+                    startAutoSlide();
+                }, 1000);
             });
         } else {
-            // للكمبيوتر
             imageGallery.addEventListener('mousedown', function(e) {
+                isUserInteracting = true;
+                stopAutoSlide();
                 dragStartX = e.clientX;
                 dragDistance = 0;
                 imageGallery.style.cursor = 'grabbing';
@@ -742,9 +759,19 @@
                 dragStartX = 0;
                 dragDistance = 0;
                 imageGallery.style.cursor = 'grab';
+                
+                // إعادة التشغيل بعد ثانية
+                setTimeout(() => {
+                    isUserInteracting = false;
+                    startAutoSlide();
+                }, 1000);
             });
             
             imageGallery.addEventListener('mouseleave', function() {
+                if (dragStartX !== 0) {
+                    isUserInteracting = false;
+                    startAutoSlide();
+                }
                 dragStartX = 0;
                 dragDistance = 0;
                 imageGallery.style.cursor = 'grab';
@@ -754,9 +781,23 @@
             document.addEventListener('keydown', function(e) {
                 if (gallerySection.classList.contains('active')) {
                     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                        isUserInteracting = true;
+                        stopAutoSlide();
                         changeImage(1);
+                        
+                        setTimeout(() => {
+                            isUserInteracting = false;
+                            startAutoSlide();
+                        }, 1000);
                     } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                        isUserInteracting = true;
+                        stopAutoSlide();
                         changeImage(-1);
+                        
+                        setTimeout(() => {
+                            isUserInteracting = false;
+                            startAutoSlide();
+                        }, 1000);
                     }
                 }
             });
@@ -771,6 +812,7 @@
         // تنظيف الموارد
         window.addEventListener('beforeunload', () => {
             clearInterval(heartsInterval);
+            stopAutoSlide();
             heartsBackground.innerHTML = '';
         });
     </script>
