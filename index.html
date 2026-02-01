@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قطة حبيبة بابا</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f9e1e9;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* خلفية القلوب المتساقطة */
+        #hearts-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        
+        .heart {
+            position: absolute;
+            top: -50px;
+            color: rgba(255, 105, 180, 0.7);
+            font-size: 22px;
+            user-select: none;
+            pointer-events: none;
+            filter: drop-shadow(0 0 5px rgba(255, 105, 180, 0.5));
+        }
+        
+        /* الإطار الرئيسي */
+        .main-frame {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(255, 105, 180, 0.2);
+            width: 90%;
+            max-width: 500px;
+            height: 800px; /* زدنا الطول اكتر */
+            padding: 20px;
+            text-align: center;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 182, 193, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            transition: background-color 0.5s ease, box-shadow 0.5s ease, border 0.5s ease;
+        }
+        
+        /* عندما يكون المعرض نشطاً، نخفي الإطار */
+        .main-frame.gallery-active {
+            background-color: transparent;
+            box-shadow: none;
+            border: none;
+            backdrop-filter: none;
+        }
+        
+        /* واجهة تسجيل الدخول */
+        .login-section {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+        }
+        
+        .login-section.hidden {
+            opacity: 0;
+            transform: translateX(-100%);
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        
+        .login-header {
+            margin-bottom: 30px;
+            padding-top: 20px;
+        }
+        
+        .login-header h1 {
+            color: #ff69b4;
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .login-header p {
+            color: #888;
+            font-size: 16px;
+        }
+        
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            flex: 1;
+            justify-content: center;
+        }
+        
+        .password-container {
+            position: relative;
+        }
+        
+        .password-container input {
+            width: 100%;
+            padding: 15px 20px;
+            padding-left: 50px;
+            border: 2px solid #ffc0cb;
+            border-radius: 12px;
+            font-size: 16px;
+            background-color: #fff;
+            color: #333;
+            transition: all 0.3s;
+        }
+        
+        .password-container input:focus {
+            outline: none;
+            border-color: #ff69b4;
+            box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.2);
+        }
+        
+        .password-container i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ff69b4;
+            font-size: 18px;
+        }
+        
+        .login-btn {
+            background-color: #ff69b4;
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 5px;
+        }
+        
+        .login-btn:hover {
+            background-color: #ff1493;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4);
+        }
+        
+        .error-message {
+            color: #ff4757;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        /* خانت التوجيهات */
+        .password-hint {
+            background-color: rgba(255, 240, 245, 0.9);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            border: 1px dashed #ff69b4;
+            position: relative;
+        }
+        
+        .password-hint p {
+            color: #d63384;
+            font-size: 15px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .sticker-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 10px 0;
+        }
+        
+        .sticker {
+            width: 70px;
+            height: 70px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 2px solid #ff69b4;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .password-note {
+            color: #ff69b4;
+            font-size: 14px;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        /* واجهة المعرض بدون إطار */
+        .gallery-section {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: transform 0.5s ease, opacity 0.5s ease;
+            z-index: 5;
+        }
+        
+        .gallery-section.active {
+            display: flex;
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        /* رأس المعرض - شفاف */
+        .gallery-header {
+            margin-bottom: 5px; /* قللنا المسافة */
+            padding: 5px 0; /* قللنا البادنج */
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border-radius: 10px;
+            margin: 5px; /* قللنا المارجن */
+            z-index: 20;
+            min-height: 40px; /* حطينا حد أدنى للارتفاع */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .gallery-header h2 {
+            color: #ff69b4;
+            font-size: 22px; /* قللنا حجم الخط */
+            font-weight: 600;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* مربع الصور - أطول بدون نصوص */
+        .image-gallery {
+            width: 100%;
+            flex: 1; /* خليها تاخد مساحة أكبر */
+            position: relative;
+            perspective: 1000px;
+            cursor: grab;
+            touch-action: pan-y;
+            padding: 5px; /* قللنا البادنج */
+            margin-bottom: 5px; /* قللنا المارجن السفلي */
+        }
+        
+        .image-gallery:active {
+            cursor: grabbing;
+        }
+        
+        .image-stack {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease;
+            will-change: transform;
+        }
+        
+        /* التعديل الأساسي: جعل الصور تظهر بالطول أكثر */
+        .image-item {
+            position: absolute;
+            width: 75%; /* عرض أقل علشان تظهر عمودية اكتر */
+            height: 90%; /* ارتفاع أكبر */
+            left: 12.5%; /* لتوسيط الصورة */
+            top: 5%; /* لتوسيط الصورة */
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.5s ease, opacity 0.5s ease;
+            backface-visibility: hidden;
+            will-change: transform, opacity, filter;
+        }
+        
+        .image-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 15px;
+        }
+        
+        /* شيلنا الـ .image-info تماماً */
+        
+        .counter {
+            margin-top: 5px; /* قللنا المسافة */
+            margin-bottom: 5px; /* قللنا المسافة */
+            color: #ff69b4;
+            font-size: 18px;
+            font-weight: 600;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 8px 15px; /* قللنا البادنج */
+            border-radius: 50px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            z-index: 20;
+            position: relative;
+            min-height: 40px; /* حطينا حد أدنى للارتفاع */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .instructions {
+            margin-top: 5px; /* قللنا المسافة */
+            color: white;
+            font-size: 13px;
+            text-align: center;
+            padding: 6px 12px; /* قللنا البادنج */
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            border-radius: 10px;
+            margin: 5px; /* قللنا المارجن */
+            z-index: 20;
+            position: relative;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            min-height: 35px; /* حطينا حد أدنى للارتفاع */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* زر العودة - شفاف */
+        .back-button {
+            background-color: rgba(255, 192, 203, 0.8);
+            color: #ff69b4;
+            border: none;
+            padding: 8px 15px; /* قللنا البادنج */
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 5px; /* قللنا المسافة */
+            margin-bottom: 5px; /* قللنا المسافة */
+            align-self: center;
+            backdrop-filter: blur(5px);
+            z-index: 20;
+            position: relative;
+            min-height: 40px; /* حطينا حد أدنى للارتفاع */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .back-button:hover {
+            background-color: rgba(255, 105, 180, 0.9);
+            color: white;
+        }
+        
+        /* التكيف مع الشاشات الصغيرة */
+        @media (max-width: 768px) {
+            .main-frame {
+                height: 750px; /* تعديل للشاشات المتوسطة */
+                max-width: 450px;
+            }
+            
+            .login-header h1 {
+                font-size: 24px;
+            }
+            
+            .image-item {
+                width: 80%; /* عرض أكبر في الشاشات الصغيرة */
+                height: 85%;
+                left: 10%;
+                top: 7.5%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .main-frame {
+                height: 700px; /* تعديل للشاشات الصغيرة */
+                max-width: 380px;
+                padding: 15px;
+            }
+            
+            .login-header h1 {
+                font-size: 22px;
+            }
+            
+            .password-hint p {
+                font-size: 14px;
+            }
+            
+            .gallery-header h2 {
+                font-size: 20px;
+            }
+            
+            .image-item {
+                width: 85%; /* عرض أكبر في الشاشات الصغيرة جداً */
+                height: 80%;
+                left: 7.5%;
+                top: 10%;
+            }
+        }
+        
+        /* تأثيرات الرسوم المتحركة */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        .login-btn {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- خلفية القلوب المتساقطة -->
+    <div id="hearts-background"></div>
+    
+    <!-- الإطار الرئيسي -->
+    <div class="main-frame" id="mainFrame">
+        <!-- قسم تسجيل الدخول -->
+        <div class="login-section" id="loginSection">
+            <div class="login-header">
+                <h1>نورتي يحبيبة بابا💕💕😔</h1>
+                <p>دخلي الباسورد يقطة</p>
+            </div>
+            
+            <form class="login-form" id="loginForm">
+                <div class="password-container">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" placeholder="الباسورد" required>
+                </div>
+                
+                <div class="error-message" id="errorMessage">كلمة المرور غير صحيحة. حاول مرة أخرى.</div>
+                
+                <button type="submit" class="login-btn">دخول</button>
+                
+                <!-- خانة التوجيهات -->
+                <div class="password-hint">
+                    <p>الباسورد: <strong>بحبك يحمودي</strong></p>
+                    <div class="sticker-container">
+                        <img src="sticker.jpg" alt="Sticker" class="sticker">
+                    </div>
+                    <div class="password-note">
+                        <span>كاتب الباسورد كد عشان تفضلي تكتبي بحبك يحمودي</span>
+                        <span>😂</span>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        <!-- قسم المعرض بدون إطار -->
+        <div class="gallery-section" id="gallerySection">
+            <div class="gallery-header">
+                <h2>بحبك</h2>
+            </div>
+            
+            <div class="image-gallery" id="imageGallery">
+                <div class="image-stack" id="imageStack">
+                    <!-- سيتم إضافة الصور ديناميكياً -->
+                </div>
+            </div>
+            
+            <div class="counter">
+                <span id="currentImage">1</span> / <span id="totalImages">19</span>
+            </div>
+            
+            <div class="instructions">
+                بحبك يا اجمل حاجة حصلتلي ربنا يخليكي ليا💑
+            </div>
+            
+            <button class="back-button" id="backButton">
+                <i class="fas fa-arrow-right"></i> العودة لصفحة الاولة
+            </button>
+        </div>
+    </div>
+    
+    <!-- عنصر الصوت (سيتم إخفاؤه) -->
+    <audio id="backgroundMusic" loop>
+        <!-- استبدل المسار بالملف الخاص بك -->
+        <source src="adiuo.mp3" type="audio/mpeg">
+        المتصفح الخاص بك لا يدعم تشغيل الصوت.
+    </audio>
+
+    <script>
+        // كلمة المرور الصحيحة
+        const CORRECT_PASSWORD = "بحبك يحمودي";
+        
+        // عناصر DOM
+        const mainFrame = document.getElementById('mainFrame');
+        const loginSection = document.getElementById('loginSection');
+        const gallerySection = document.getElementById('gallerySection');
+        const loginForm = document.getElementById('loginForm');
+        const passwordInput = document.getElementById('password');
+        const errorMessage = document.getElementById('errorMessage');
+        const backgroundMusic = document.getElementById('backgroundMusic');
+        const imageStack = document.getElementById('imageStack');
+        const currentImageSpan = document.getElementById('currentImage');
+        const totalImagesSpan = document.getElementById('totalImages');
+        const imageGallery = document.getElementById('imageGallery');
+        const heartsBackground = document.getElementById('hearts-background');
+        const backButton = document.getElementById('backButton');
+        
+        // عدد الصور
+        const TOTAL_IMAGES = 19;
+        totalImagesSpan.textContent = TOTAL_IMAGES;
+        
+        // الصورة الحالية
+        let currentImageIndex = 1;
+        let isDragging = false;
+        let startX = 0;
+        let currentX = 0;
+        let heartsManager = null;
+        
+        // نظام القلوب المتساقطة
+        class HeartsManager {
+            constructor() {
+                this.hearts = [];
+                this.maxHearts = 15;
+                this.lastHeartTime = 0;
+                this.heartInterval = 400;
+                this.heartIcons = ['❤️', '💖', '💗', '💓', '💞', '💕'];
+                this.animationFrameId = null;
+                this.isActive = true;
+                
+                this.init();
+            }
+            
+            init() {
+                this.updateHearts();
+            }
+            
+            createHeart() {
+                if (!this.isActive || this.hearts.length >= this.maxHearts) return;
+                
+                const heart = document.createElement('div');
+                heart.classList.add('heart');
+                heart.innerHTML = this.heartIcons[Math.floor(Math.random() * this.heartIcons.length)];
+                
+                // وضع عشوائي
+                const left = Math.random() * 100;
+                const size = Math.random() * 18 + 12;
+                const duration = Math.random() * 15 + 12;
+                
+                heart.style.left = `${left}%`;
+                heart.style.fontSize = `${size}px`;
+                
+                heartsBackground.appendChild(heart);
+                
+                const heartData = {
+                    element: heart,
+                    startTime: Date.now(),
+                    duration: duration * 1000,
+                    speed: 0.5 + Math.random() * 0.5,
+                    left: left
+                };
+                
+                this.hearts.push(heartData);
+            }
+            
+            updateHearts() {
+                if (!this.isActive) return;
+                
+                const currentTime = Date.now();
+                
+                // إنشاء قلب جديد في الفترات
+                if (currentTime - this.lastHeartTime > this.heartInterval) {
+                    this.createHeart();
+                    this.lastHeartTime = currentTime;
+                }
+                
+                // تحديث مواقع القلوب
+                for (let i = this.hearts.length - 1; i >= 0; i--) {
+                    const heart = this.hearts[i];
+                    const elapsed = currentTime - heart.startTime;
+                    const progress = Math.min(elapsed / heart.duration, 1);
+                    
+                    // حساب الموضع العمودي
+                    const top = -50 + (progress * (window.innerHeight + 100));
+                    heart.element.style.top = `${top}px`;
+                    
+                    // حركة أفقية خفيفة
+                    const swing = Math.sin(progress * Math.PI * 2) * 10;
+                    heart.element.style.transform = `translateX(${swing}px) rotate(${progress * 360}deg)`;
+                    
+                    // تغيير الشفافية
+                    heart.element.style.opacity = 1 - progress * 0.8;
+                    
+                    // إزالة القلب إذا انتهت حركته
+                    if (progress >= 1) {
+                        heart.element.remove();
+                        this.hearts.splice(i, 1);
+                    }
+                }
+                
+                // الاستمرار في التحديث
+                this.animationFrameId = requestAnimationFrame(() => this.updateHearts());
+            }
+            
+            stop() {
+                this.isActive = false;
+                if (this.animationFrameId) {
+                    cancelAnimationFrame(this.animationFrameId);
+                }
+                
+                // إزالة جميع القلوب
+                this.hearts.forEach(heart => heart.element.remove());
+                this.hearts = [];
+            }
+        }
+        
+        // إنشاء مدير القلوب
+        function initHearts() {
+            heartsManager = new HeartsManager();
+        }
+        
+        // إنشاء معرض الصور بدون نصوص
+        function createImageGallery() {
+            imageStack.innerHTML = '';
+            
+            // إضافة الصور إلى المعرض - استخدم مسارات الصور الخاصة بك
+            for (let i = 1; i <= TOTAL_IMAGES; i++) {
+                const imageItem = document.createElement('div');
+                imageItem.classList.add('image-item');
+                imageItem.dataset.index = i;
+                
+                // استخدام صور من ملفاتك المحلية
+                const img = document.createElement('img');
+                img.src = `image${i}.jpg`;  // هاتشغل من image1.jpg لحد image19.jpg
+                img.alt = `صورة ${i}`;
+                img.loading = "lazy";
+                
+                // شيلنا الـ imageInfo تماماً
+                
+                imageItem.appendChild(img);
+                imageStack.appendChild(imageItem);
+            }
+            
+            // ترتيب الصور في شكل مبعثر
+            arrangeImages();
+        }
+        
+        // ترتيب الصور في شكل مبعثر
+        function arrangeImages() {
+            const imageItems = document.querySelectorAll('.image-item');
+            
+            imageItems.forEach((item, index) => {
+                const itemIndex = parseInt(item.dataset.index);
+                const distance = Math.abs(currentImageIndex - itemIndex);
+                
+                // إذا كانت الصورة هي الحالية
+                if (itemIndex === currentImageIndex) {
+                    item.style.transform = 'translateZ(0px)';
+                    item.style.zIndex = '20';
+                    item.style.opacity = '1';
+                    item.style.filter = 'blur(0px)';
+                } 
+                // إذا كانت الصورة وراء الحالية
+                else if (itemIndex < currentImageIndex) {
+                    const offset = (currentImageIndex - itemIndex) * 5;
+                    item.style.transform = `translateZ(-${offset * 5}px) translateX(-${offset}px) rotateY(5deg)`;
+                    item.style.zIndex = (20 - distance).toString();
+                    item.style.opacity = (1 - distance * 0.15).toString();
+                    item.style.filter = `blur(${distance * 0.3}px)`;
+                } 
+                // إذا كانت الصورة أمام الحالية
+                else {
+                    const offset = (itemIndex - currentImageIndex) * 5;
+                    item.style.transform = `translateZ(-${offset * 5}px) translateX(${offset}px) rotateY(-5deg)`;
+                    item.style.zIndex = (20 - distance).toString();
+                    item.style.opacity = (1 - distance * 0.15).toString();
+                    item.style.filter = `blur(${distance * 0.3}px)`;
+                }
+            });
+            
+            // تحديث العداد
+            currentImageSpan.textContent = currentImageIndex;
+        }
+        
+        // معالجة تسجيل الدخول
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const enteredPassword = passwordInput.value.trim();
+            
+            if (enteredPassword === CORRECT_PASSWORD) {
+                // الدخول ناجح
+                errorMessage.style.display = 'none';
+                
+                // إخفاء قسم تسجيل الدخول
+                loginSection.classList.add('hidden');
+                
+                // إزالة الإطار الأبيض
+                mainFrame.classList.add('gallery-active');
+                
+                // إنشاء المعرض
+                createImageGallery();
+                
+                // تأخير عرض المعرض
+                setTimeout(() => {
+                    gallerySection.classList.add('active');
+                    
+                    // تشغيل الموسيقى تلقائياً
+                    backgroundMusic.play().catch(e => {
+                        console.log("تعذر تشغيل الموسيقى تلقائياً");
+                    });
+                }, 300);
+            } else {
+                // الدخول فاشل
+                errorMessage.style.display = 'block';
+                passwordInput.focus();
+                
+                // تأثير اهتزاز
+                loginForm.style.animation = 'none';
+                setTimeout(() => {
+                    loginForm.style.animation = 'shake 0.5s';
+                }, 10);
+            }
+        });
+        
+        // زر العودة لتسجيل الدخول
+        backButton.addEventListener('click', function() {
+            // إخفاء قسم المعرض
+            gallerySection.classList.remove('active');
+            
+            // إعادة الإطار الأبيض
+            mainFrame.classList.remove('gallery-active');
+            
+            // تأخير إظهار قسم تسجيل الدخول
+            setTimeout(() => {
+                loginSection.classList.remove('hidden');
+                
+                // إيقاف الموسيقى
+                backgroundMusic.pause();
+                backgroundMusic.currentTime = 0;
+                
+                // إعادة تعيين كلمة المرور
+                passwordInput.value = '';
+                passwordInput.focus();
+            }, 300);
+        });
+        
+        // التحكم في الصور بالسحب (للجوال)
+        imageGallery.addEventListener('touchstart', handleTouchStart, { passive: true });
+        imageGallery.addEventListener('touchmove', handleTouchMove, { passive: true });
+        imageGallery.addEventListener('touchend', handleTouchEnd);
+        
+        // التحكم في الصور بالسحب (للكمبيوتر)
+        imageGallery.addEventListener('mousedown', handleMouseDown);
+        imageGallery.addEventListener('mousemove', handleMouseMove);
+        imageGallery.addEventListener('mouseup', handleMouseUp);
+        imageGallery.addEventListener('mouseleave', handleMouseUp);
+        
+        function handleTouchStart(e) {
+            isDragging = true;
+            startX = e.touches[0].clientX;
+            currentX = startX;
+        }
+        
+        function handleTouchMove(e) {
+            if (!isDragging) return;
+            
+            currentX = e.touches[0].clientX;
+            const diff = currentX - startX;
+            
+            // تحديث موقع الصور أثناء السحب
+            updateImagePosition(diff);
+        }
+        
+        function handleTouchEnd() {
+            if (!isDragging) return;
+            
+            const diff = currentX - startX;
+            const threshold = 50;
+            
+            // إذا تجاوز السحب الحد الأدنى، تغيير الصورة
+            if (Math.abs(diff) > threshold) {
+                if (diff > 0) {
+                    // سحب لليمين - الصورة السابقة
+                    changeImage(-1);
+                } else {
+                    // سحب لليسار - الصورة التالية
+                    changeImage(1);
+                }
+            }
+            
+            // إعادة ترتيب الصور
+            arrangeImages();
+            isDragging = false;
+        }
+        
+        function handleMouseDown(e) {
+            isDragging = true;
+            startX = e.clientX;
+            currentX = startX;
+            imageGallery.style.cursor = 'grabbing';
+        }
+        
+        function handleMouseMove(e) {
+            if (!isDragging) return;
+            
+            currentX = e.clientX;
+            const diff = currentX - startX;
+            
+            // تحديث موقع الصور أثناء السحب
+            updateImagePosition(diff);
+        }
+        
+        function handleMouseUp() {
+            if (!isDragging) return;
+            
+            const diff = currentX - startX;
+            const threshold = 50;
+            
+            // إذا تجاوز السحب الحد الأدنى، تغيير الصورة
+            if (Math.abs(diff) > threshold) {
+                if (diff > 0) {
+                    // سحب لليمين - الصورة السابقة
+                    changeImage(-1);
+                } else {
+                    // سحب لليسار - الصورة التالية
+                    changeImage(1);
+                }
+            }
+            
+            // إعادة ترتيب الصور
+            arrangeImages();
+            isDragging = false;
+            imageGallery.style.cursor = 'grab';
+        }
+        
+        function updateImagePosition(diff) {
+            const imageItems = document.querySelectorAll('.image-item');
+            
+            imageItems.forEach((item) => {
+                const itemIndex = parseInt(item.dataset.index);
+                const distance = Math.abs(currentImageIndex - itemIndex);
+                
+                // حساب التحويل بناءً على المسافة والسحب
+                let translateX = 0;
+                let rotateY = 0;
+                
+                if (itemIndex === currentImageIndex) {
+                    translateX = diff * 0.5;
+                    rotateY = diff * 0.05;
+                } else if (itemIndex < currentImageIndex) {
+                    const offset = (currentImageIndex - itemIndex) * 5;
+                    translateX = -offset + diff * 0.3;
+                    rotateY = 5 + diff * 0.03;
+                } else {
+                    const offset = (itemIndex - currentImageIndex) * 5;
+                    translateX = offset + diff * 0.3;
+                    rotateY = -5 + diff * 0.03;
+                }
+                
+                const offsetZ = distance * 5;
+                item.style.transform = `translateZ(-${offsetZ}px) translateX(${translateX}px) rotateY(${rotateY}deg)`;
+            });
+        }
+        
+        function changeImage(direction) {
+            currentImageIndex += direction;
+            
+            // التأكد من أن الفهرس يبقى ضمن النطاق
+            if (currentImageIndex < 1) {
+                currentImageIndex = TOTAL_IMAGES;
+            } else if (currentImageIndex > TOTAL_IMAGES) {
+                currentImageIndex = 1;
+            }
+        }
+        
+        // بدء تشغيل الخلفية عند تحميل الصفحة
+        window.addEventListener('DOMContentLoaded', () => {
+            // تهيئة مدير القلوب
+            initHearts();
+            
+            // تعيين التركيز على حقل كلمة المرور
+            passwordInput.focus();
+        });
+        
+        // تنظيف الموارد عند إغلاق الصفحة
+        window.addEventListener('beforeunload', () => {
+            if (heartsManager) {
+                heartsManager.stop();
+            }
+        });
+    </script>
+</body>
+</html>
