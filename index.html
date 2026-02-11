@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>قطة حبيبة بابا</title>
+    <title>ماما الصغننة</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -11,6 +11,13 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
         
         body {
@@ -19,7 +26,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
+            overflow-x: hidden;
             position: relative;
         }
         
@@ -51,7 +58,7 @@
             box-shadow: 0 15px 35px rgba(255, 105, 180, 0.2);
             width: 90%;
             max-width: 500px;
-            height: 800px;
+            height: 850px;
             padding: 20px;
             text-align: center;
             z-index: 10;
@@ -68,15 +75,34 @@
             background-color: transparent;
             box-shadow: none;
             border: none;
+            overflow-y: auto;
+            height: 100vh;
+            max-height: 100vh;
+            max-width: 100%;
+            border-radius: 0;
         }
         
-        /* واجهة تسجيل الدخول */
+        /* إخفاء شريط التمرير */
+        .main-frame.gallery-active::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            height: 0;
+        }
+        
+        .main-frame.gallery-active {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        
+        /* واجهة تسجيل الدخول الجديدة */
         .login-section {
             display: flex;
             flex-direction: column;
             height: 100%;
             width: 100%;
             transition: opacity 0.5s ease;
+            justify-content: center;
+            align-items: center;
         }
         
         .login-section.hidden {
@@ -85,138 +111,87 @@
         }
         
         .login-header {
-            margin-bottom: 30px;
-            padding-top: 20px;
-        }
-        
-        .login-header h1 {
-            color: #ff69b4;
-            font-size: 28px;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-        
-        .login-header p {
-            color: #888;
-            font-size: 16px;
-        }
-        
-        .login-form {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-            flex: 1;
-            justify-content: center;
-        }
-        
-        .password-container {
-            position: relative;
-        }
-        
-        .password-container input {
+            margin-bottom: 40px;
             width: 100%;
-            padding: 15px 20px;
-            padding-left: 50px;
-            border: 2px solid #ffc0cb;
-            border-radius: 12px;
-            font-size: 16px;
-            background-color: #fff;
-            color: #333;
-            transition: all 0.3s;
         }
         
-        .password-container input:focus {
-            outline: none;
-            border-color: #ff69b4;
-            box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.2);
+        .login-gif {
+            width: 300px;
+            height: 300px;
+            border-radius: 20px;
+            object-fit: cover;
+            margin-bottom: 25px;
+            border: 3px solid #ff69b4;
+            box-shadow: 0 10px 20px rgba(255, 105, 180, 0.3);
         }
         
-        .password-container i {
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
+        .login-question {
             color: #ff69b4;
-            font-size: 18px;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 40px;
+            text-align: center;
+            line-height: 1.5;
         }
         
-        .login-btn {
-            background-color: #ff69b4;
-            color: white;
+        /* أزرار الاختيار */
+        .buttons-container {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+            position: relative;
+            width: 100%;
+            justify-content: center;
+            transition: all 0.5s ease;
+        }
+        
+        .yes-btn, .no-btn {
+            padding: 18px 35px;
             border: none;
-            padding: 16px;
-            border-radius: 12px;
-            font-size: 18px;
+            border-radius: 15px;
+            font-size: 20px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
-            margin-top: 5px;
-        }
-        
-        .login-btn:hover {
-            background-color: #ff1493;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4);
-        }
-        
-        .error-message {
-            color: #ff4757;
-            font-size: 14px;
-            margin-top: 5px;
-            display: none;
-        }
-        
-        /* خانت التوجيهات */
-        .password-hint {
-            background-color: rgba(255, 240, 245, 0.9);
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 15px;
-            border: 1px dashed #ff69b4;
+            min-width: 150px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
             position: relative;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
         
-        .password-hint p {
-            color: #d63384;
-            font-size: 15px;
-            margin-bottom: 8px;
-            font-weight: 500;
+        .yes-btn {
+            background-color: #4CAF50;
+            color: white;
+            transition: all 0.5s ease;
         }
         
-        .sticker-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 10px 0;
+        .yes-btn:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(76, 175, 80, 0.4);
         }
         
-        .sticker {
-            width: 70px;
-            height: 70px;
-            border-radius: 12px;
-            object-fit: cover;
-            border: 2px solid #ff69b4;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        .no-btn {
+            background-color: #ff4757;
+            color: white;
+            transition: all 0.3s ease;
         }
         
-        .password-note {
-            color: #ff69b4;
-            font-size: 14px;
-            margin-top: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
+        .no-btn:hover {
+            background-color: '#ff3742';
         }
         
         /* واجهة المعرض بدون إطار */
         .gallery-section {
             display: none;
             flex-direction: column;
-            height: 100%;
             width: 100%;
             opacity: 0;
             transition: opacity 0.5s ease;
+            min-height: 100vh;
         }
         
         .gallery-section.active {
@@ -224,59 +199,87 @@
             opacity: 1;
         }
         
-        /* رأس المعرض - شفاف */
+        /* رأس المعرض - مع الصورة الجديدة */
         .gallery-header {
-            padding: 10px 0;
+            padding: 15px 0;
             z-index: 20;
             flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.9);
+            width: 100%;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .hug-gif {
+            width: 180px;
+            height: 180px;
+            border-radius: 15px;
+            object-fit: cover;
+            margin-bottom: 10px;
+            border: 3px solid #ff69b4;
+            box-shadow: 0 8px 15px rgba(255, 105, 180, 0.3);
         }
         
         .gallery-header h2 {
             color: #ff69b4;
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 600;
         }
         
-        /* مربع الصور - مبسط */
+        /* حاوية كل الصور - الطويلة */
+        .image-gallery-container {
+            width: 100%;
+            position: relative;
+            overflow: visible;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+        }
+        
+        /* قائمة الصور العمودية الطويلة */
         .image-gallery {
             width: 100%;
-            flex: 1;
-            position: relative;
-            cursor: grab;
-            touch-action: pan-y;
-            padding: 5px;
-            margin: 10px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
         }
         
-        .image-gallery:active {
-            cursor: grabbing;
-        }
-        
-        .image-stack {
+        /* كل صورة فردية - بنسبة 9:16 */
+        .gallery-image-item {
             width: 100%;
-            height: 100%;
+            max-width: 450px;
+            height: 800px; /* 450 * 1280/720 = 800 */
             position: relative;
-            transition: transform 0.3s ease;
-        }
-        
-        /* الصورة الرئيسية */
-        .image-item {
-            position: absolute;
-            width: 100%;
-            height: 100%;
             border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-            transition: transform 0.3s ease, opacity 0.3s ease, filter 0.3s ease;
-            backface-visibility: hidden;
-            transform-origin: center center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+            background-color: #000;
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-drag: none;
         }
         
-        .image-item img {
+        /* الصور تظهر بنفس النظام القديم */
+        .gallery-image-item img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
             border-radius: 15px;
+            pointer-events: none;
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-drag: none;
+            background-color: #000;
         }
         
         .counter {
@@ -284,23 +287,11 @@
             font-size: 18px;
             font-weight: 600;
             background-color: rgba(255, 255, 255, 0.9);
-            padding: 10px 20px;
+            padding: 8px 18px;
             border-radius: 50px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             z-index: 20;
-            margin: 10px 0;
-            flex-shrink: 0;
-        }
-        
-        .instructions {
-            color: #ff69b4;
-            font-size: 14px;
-            text-align: center;
-            padding: 8px 15px;
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 10px;
-            margin: 10px 0;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            margin: 15px 0;
             flex-shrink: 0;
         }
         
@@ -311,14 +302,21 @@
             border: none;
             padding: 12px 25px;
             border-radius: 50px;
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
-            margin-top: 10px;
+            margin: 20px 0;
             align-self: center;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             flex-shrink: 0;
+            position: sticky;
+            bottom: 20px;
+            z-index: 100;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
         
         .back-button:hover {
@@ -329,45 +327,144 @@
         /* التكيف مع الشاشات الصغيرة */
         @media (max-width: 768px) {
             .main-frame {
-                height: 700px;
+                height: 800px;
                 max-width: 450px;
             }
             
-            .login-header h1 {
-                font-size: 24px;
+            .login-gif {
+                width: 250px;
+                height: 250px;
+            }
+            
+            .login-question {
+                font-size: 22px;
+            }
+            
+            .buttons-container {
+                gap: 20px;
+            }
+            
+            .yes-btn, .no-btn {
+                padding: 15px 30px;
+                font-size: 18px;
+                min-width: 130px;
+            }
+            
+            .hug-gif {
+                width: 160px;
+                height: 160px;
+            }
+            
+            .gallery-header h2 {
+                font-size: 20px;
+            }
+            
+            .gallery-image-item {
+                max-width: 400px;
+                height: 711px; /* 400 * 1280/720 = 711 */
             }
         }
         
         @media (max-width: 480px) {
             .main-frame {
-                height: 650px;
+                height: 750px;
                 max-width: 380px;
                 padding: 15px;
             }
             
-            .login-header h1 {
-                font-size: 22px;
+            .login-gif {
+                width: 220px;
+                height: 220px;
+            }
+            
+            .login-question {
+                font-size: 20px;
+                margin-bottom: 30px;
+            }
+            
+            .buttons-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .yes-btn, .no-btn {
+                width: 80%;
+                padding: 12px 20px;
+                font-size: 18px;
+            }
+            
+            .hug-gif {
+                width: 140px;
+                height: 140px;
             }
             
             .gallery-header h2 {
-                font-size: 20px;
+                font-size: 18px;
+            }
+            
+            .counter {
+                font-size: 16px;
+                padding: 7px 15px;
+            }
+            
+            .back-button {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+            
+            .gallery-image-item {
+                max-width: 350px;
+                height: 622px; /* 350 * 1280/720 = 622 */
+            }
+        }
+        
+        @media (max-width: 380px) {
+            .gallery-image-item {
+                max-width: 320px;
+                height: 569px; /* 320 * 1280/720 = 569 */
             }
         }
         
         /* تأثيرات بسيطة */
         @keyframes float {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-3px); }
-        }
-        
-        .login-btn {
-            animation: float 3s ease-in-out infinite;
+            50% { transform: translateY(-5px); }
         }
         
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-5px); }
             75% { transform: translateX(5px); }
+        }
+        
+        .yes-btn {
+            animation: float 2s ease-in-out infinite;
+        }
+        
+        @keyframes moveRandom {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(50px, 30px); }
+            50% { transform: translate(-40px, 60px); }
+            75% { transform: translate(60px, -30px); }
+            100% { transform: translate(-20px, 40px); }
+        }
+        
+        .no-btn.moving {
+            animation: moveRandom 0.8s ease-in-out;
+        }
+        
+        /* تصميم الهامش السفلي للصفحة */
+        .page-footer {
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+            color: #ff69b4;
+            font-size: 14px;
+            margin-top: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
@@ -377,59 +474,43 @@
     
     <!-- الإطار الرئيسي -->
     <div class="main-frame" id="mainFrame">
-        <!-- قسم تسجيل الدخول -->
+        <!-- قسم تسجيل الدخول الجديد -->
         <div class="login-section" id="loginSection">
             <div class="login-header">
-                <h1>نورتي يحبيبة بابا💕💕😔</h1>
-                <p>دخلي الباسورد يقطة</p>
+                <img src="milk-and-mocha.gif" alt="Milk and Mocha" class="login-gif">
+                <p class="login-question">ماما ماما ماما ماما انتي بتحبيني ولا لا</p>
             </div>
             
-            <form class="login-form" id="loginForm">
-                <div class="password-container">
-                    <i class="fas fa-lock"></i>
-                    <input type="password" id="password" placeholder="الباسورد" required>
-                </div>
-                
-                <div class="error-message" id="errorMessage">كلمة المرور غير صحيحة. حاول مرة أخرى.</div>
-                
-                <button type="submit" class="login-btn">دخول</button>
-                
-                <!-- خانة التوجيهات -->
-                <div class="password-hint">
-                    <p>الباسورد: <strong>بحبك يحمودي</strong></p>
-                    <div class="sticker-container">
-                        <img src="sticker.jpg" alt="Sticker" class="sticker">
-                    </div>
-                    <div class="password-note">
-                        <span>كاتب الباسورد كد عشان تفضلي تكتبي بحبك يحمودي</span>
-                        <span>😂</span>
-                    </div>
-                </div>
-            </form>
+            <div class="buttons-container" id="buttonsContainer">
+                <button class="yes-btn" id="yesButton">ايوا يروح ماما</button>
+                <button class="no-btn" id="noButton">لا</button>
+            </div>
         </div>
         
         <!-- قسم المعرض بدون إطار -->
         <div class="gallery-section" id="gallerySection">
             <div class="gallery-header">
-                <h2>بحبك</h2>
+                <img src="hug.gif" alt="Hug" class="hug-gif">
+                <h2>بحبك يا قطوتي 💕</h2>
             </div>
             
-            <div class="image-gallery" id="imageGallery">
-                <div class="image-stack" id="imageStack">
+            <div class="counter">
+                عدد الصور: <span id="totalImages">18</span>
+            </div>
+            
+            <div class="image-gallery-container" id="imageGalleryContainer">
+                <div class="image-gallery" id="imageGallery">
                     <!-- سيتم إضافة الصور ديناميكياً -->
                 </div>
             </div>
             
-            <div class="counter">
-                <span id="currentImage">1</span> / <span id="totalImages">18</span>
-            </div>
-            
-            <div class="instructions">
-                بحبك يا اجمل حاجة حصلتلي ربنا يخليكي ليا💑
+            <div class="page-footer">
+                 <p>  كل ده معمول علشانك يك يطمرر بحبك يباردة ومتخافيش زاكرت</p>
+                  
             </div>
             
             <button class="back-button" id="backButton">
-                <i class="fas fa-arrow-right"></i> العودة لصفحة الاولة
+                <i class="fas fa-arrow-right"></i> العودة للصفحة الاولة
             </button>
         </div>
     </div>
@@ -441,37 +522,30 @@
     </audio>
 
     <script>
-        // كلمة المرور الصحيحة
-        const CORRECT_PASSWORD = "بحبك يحمودي";
-        
         // عناصر DOM
         const mainFrame = document.getElementById('mainFrame');
         const loginSection = document.getElementById('loginSection');
         const gallerySection = document.getElementById('gallerySection');
-        const loginForm = document.getElementById('loginForm');
-        const passwordInput = document.getElementById('password');
-        const errorMessage = document.getElementById('errorMessage');
         const backgroundMusic = document.getElementById('backgroundMusic');
-        const imageStack = document.getElementById('imageStack');
-        const currentImageSpan = document.getElementById('currentImage');
-        const totalImagesSpan = document.getElementById('totalImages');
         const imageGallery = document.getElementById('imageGallery');
+        const totalImagesSpan = document.getElementById('totalImages');
         const heartsBackground = document.getElementById('hearts-background');
         const backButton = document.getElementById('backButton');
+        const yesButton = document.getElementById('yesButton');
+        const noButton = document.getElementById('noButton');
+        const buttonsContainer = document.getElementById('buttonsContainer');
         
-        // عدد الصور - غيرنا إلى 18 فقط
+        // متغيرات للأزرار
+        let yesButtonSize = 1;
+        let noClickCount = 0;
+        let noButtonMoves = 0;
+        const maxMoves = 10;
+        
+        // عدد الصور
         const TOTAL_IMAGES = 18;
         totalImagesSpan.textContent = TOTAL_IMAGES;
         
-        // الصورة الحالية
-        let currentImageIndex = 1;
-        let isDragging = false;
-        let startX = 0;
-        let currentX = 0;
         let heartsInterval = null;
-        let autoSlideInterval = null;
-        let isAutoSliding = true;
-        let isUserInteracting = false;
         
         // نظام القلوب المتساقطة - مبسط
         function initHearts() {
@@ -528,137 +602,85 @@
             }
         }
         
-        // نظام التمرير التلقائي
-        function startAutoSlide() {
-            if (autoSlideInterval) clearInterval(autoSlideInterval);
-            
-            autoSlideInterval = setInterval(() => {
-                if (!isUserInteracting && isAutoSliding && gallerySection.classList.contains('active')) {
-                    changeImage(1);
-                }
-            }, 2000); // كل ثانيتين
-        }
-        
-        function stopAutoSlide() {
-            if (autoSlideInterval) {
-                clearInterval(autoSlideInterval);
-                autoSlideInterval = null;
-            }
-        }
-        
-        // إنشاء معرض الصور
-        function createImageGallery() {
-            imageStack.innerHTML = '';
-            
-            // تحميل الصور من 1 إلى 18 فقط
-            for (let i = 1; i <= TOTAL_IMAGES; i++) {
-                loadImage(i);
-            }
-            
-            updateImagePosition();
-            
-            // بدء التمرير التلقائي
-            startAutoSlide();
-        }
-        
-        // تحميل صورة واحدة
-        function loadImage(index) {
-            if (index < 1 || index > TOTAL_IMAGES) return;
-            
-            const imageItem = document.createElement('div');
-            imageItem.classList.add('image-item');
-            imageItem.dataset.index = index;
-            
-            const img = new Image();
-            img.src = `image${index}.jpg`;
-            img.alt = `صورة ${index}`;
-            img.loading = "eager";
-            
-            img.onload = function() {
-                imageItem.appendChild(img);
-                imageStack.appendChild(imageItem);
-                
-                // أحداث للتوقف عند التفاعل
-                imageItem.addEventListener('touchstart', handleInteractionStart);
-                imageItem.addEventListener('mousedown', handleInteractionStart);
-                imageItem.addEventListener('touchend', handleInteractionEnd);
-                imageItem.addEventListener('mouseup', handleInteractionEnd);
-                imageItem.addEventListener('mouseleave', handleInteractionEnd);
-            };
-        }
-        
-        // بدء التفاعل مع الصورة
-        function handleInteractionStart() {
-            isUserInteracting = true;
-            stopAutoSlide();
-        }
-        
-        // انتهاء التفاعل مع الصورة
-        function handleInteractionEnd() {
-            isUserInteracting = false;
-            
-            // إعادة تشغيل التمرير التلقائي بعد 1 ثانية من ترك المستخدم للصورة
-            setTimeout(() => {
-                if (!isUserInteracting) {
-                    startAutoSlide();
-                }
-            }, 1000);
-        }
-        
-        // تحديث موقع الصور
-        function updateImagePosition() {
-            const imageItems = document.querySelectorAll('.image-item');
-            
-            imageItems.forEach((item) => {
-                const itemIndex = parseInt(item.dataset.index);
-                const distance = Math.abs(currentImageIndex - itemIndex);
-                
-                if (itemIndex === currentImageIndex) {
-                    item.style.transform = 'scale(1)';
-                    item.style.zIndex = '10';
-                    item.style.opacity = '1';
-                    item.style.filter = 'none';
-                } else if (itemIndex < currentImageIndex) {
-                    item.style.transform = `translateX(-${distance * 30}px) scale(${1 - distance * 0.1})`;
-                    item.style.zIndex = (9 - distance).toString();
-                    item.style.opacity = (0.8 - distance * 0.2).toString();
-                    item.style.filter = `blur(${distance}px)`;
-                } else {
-                    item.style.transform = `translateX(${distance * 30}px) scale(${1 - distance * 0.1})`;
-                    item.style.zIndex = (9 - distance).toString();
-                    item.style.opacity = (0.8 - distance * 0.2).toString();
-                    item.style.filter = `blur(${distance}px)`;
-                }
-            });
-            
-            currentImageSpan.textContent = currentImageIndex;
-        }
-        
-        // تغيير الصورة
-        function changeImage(direction) {
-            const oldIndex = currentImageIndex;
-            currentImageIndex += direction;
-            
-            if (currentImageIndex < 1) {
-                currentImageIndex = TOTAL_IMAGES;
-            } else if (currentImageIndex > TOTAL_IMAGES) {
-                currentImageIndex = 1;
-            }
-            
-            updateImagePosition();
-        }
-        
-        // معالجة تسجيل الدخول
-        loginForm.addEventListener('submit', function(e) {
+        // زر "لا" يتحرك عند الضغط عليه
+        noButton.addEventListener('click', function(e) {
             e.preventDefault();
+            e.stopPropagation();
             
-            const enteredPassword = passwordInput.value.trim();
+            noClickCount++;
+            noButtonMoves++;
             
-            if (enteredPassword === CORRECT_PASSWORD) {
-                errorMessage.style.display = 'none';
+            // إذا وصلنا لعدد التحركات القصوى، نجعل زر "لا" يختفي
+            if (noButtonMoves >= maxMoves) {
+                noButton.style.opacity = '0';
+                noButton.style.pointerEvents = 'none';
                 
-                backgroundMusic.load();
+                // تكبير زر "ايوا يروح ماما" أكثر
+                yesButtonSize += 0.5;
+                yesButton.style.transform = `scale(${yesButtonSize})`;
                 
+                // عرض رسالة
+                setTimeout(() => {
+                    alert('مفيش فايدة! لازم تضغطي على "ايوا يروح ماما" 😄');
+                }, 300);
+                
+                return;
+            }
+            
+            // تأثير اهتزاز
+            noButton.classList.add('moving');
+            
+            // تغيير لون الزر قليلاً
+            noButton.style.backgroundColor = '#ff6b81';
+            
+            // حركة عشوائية داخل الحاوية
+            const containerRect = buttonsContainer.getBoundingClientRect();
+            const buttonRect = noButton.getBoundingClientRect();
+            
+            // حساب إحداثيات عشوائية داخل الحاوية
+            const maxX = containerRect.width - buttonRect.width - 20;
+            const maxY = containerRect.height - buttonRect.height - 20;
+            
+            // إذا كانت الشاشة صغيرة، نتحرك بشكل أقل
+            const randomX = window.innerWidth < 480 ? 
+                Math.random() * 50 * (Math.random() > 0.5 ? 1 : -1) : 
+                Math.random() * maxX * (Math.random() > 0.5 ? 1 : -1);
+            
+            const randomY = window.innerWidth < 480 ? 
+                Math.random() * 30 * (Math.random() > 0.5 ? 1 : -1) : 
+                Math.random() * maxY * (Math.random() > 0.5 ? 1 : -1);
+            
+            // تطبيق الحركة
+            noButton.style.transform = `translate(${randomX}px, ${randomY}px)`;
+            
+            // تكبير زر "ايوا يروح ماما"
+            yesButtonSize += 0.1;
+            yesButton.style.transform = `scale(${yesButtonSize})`;
+            
+            // إعادة لون الزر بعد فترة
+            setTimeout(() => {
+                noButton.style.backgroundColor = '#ff4757';
+                noButton.classList.remove('moving');
+            }, 800);
+            
+            // تغيير نص زر "لا" بعد عدة محاولات
+            if (noClickCount === 3) {
+                noButton.textContent = 'لا... بجد!';
+            } else if (noClickCount === 5) {
+                noButton.textContent = 'متدايقنيش يباردة!';
+            } else if (noClickCount === 8) {
+                noButton.textContent = 'خلاص بقى!';
+            }
+        });
+        
+        // زر "ايوا يروح ماما" - الدخول للمعرض
+        yesButton.addEventListener('click', function() {
+            // تأثير التكبير النهائي
+            yesButtonSize += 0.3;
+            yesButton.style.transform = `scale(${yesButtonSize})`;
+            yesButton.style.backgroundColor = '#2e7d32';
+            
+            setTimeout(() => {
                 loginSection.classList.add('hidden');
                 mainFrame.classList.add('gallery-active');
                 
@@ -672,20 +694,46 @@
                         });
                     }, 500);
                 }, 300);
-            } else {
-                errorMessage.style.display = 'block';
-                passwordInput.focus();
+            }, 500);
+        });
+        
+        // عند الاقتراب من زر "لا" (للأجهزة التي تعمل بالماوس)
+        noButton.addEventListener('mouseover', function() {
+            if (noButtonMoves < maxMoves) {
+                noButton.style.cursor = 'not-allowed';
                 
-                loginForm.style.animation = 'shake 0.3s';
+                // حركة طفيفة عند الاقتراب
+                noButton.style.transform = 'translateY(-2px)';
+                
                 setTimeout(() => {
-                    loginForm.style.animation = '';
-                }, 300);
+                    noButton.style.transform = '';
+                }, 200);
             }
         });
         
+        // إنشاء معرض الصور بنظام بسيط
+        function createImageGallery() {
+            imageGallery.innerHTML = '';
+            
+            // إنشاء 18 صورة بالمسار القديم image1.jpg إلى image18.jpg
+            for (let i = 1; i <= TOTAL_IMAGES; i++) {
+                const imageItem = document.createElement('div');
+                imageItem.className = 'gallery-image-item';
+                
+                const img = document.createElement('img');
+                img.src = `image${i}.jpg`;
+                img.alt = `صورة ${i}`;
+                
+                // إضافة الصورة للعنصر
+                imageItem.appendChild(img);
+                
+                // إضافة العنصر للمعرض
+                imageGallery.appendChild(imageItem);
+            }
+        }
+        
         // زر العودة
         backButton.addEventListener('click', function() {
-            stopAutoSlide();
             gallerySection.classList.remove('active');
             mainFrame.classList.remove('gallery-active');
             
@@ -693,126 +741,34 @@
                 loginSection.classList.remove('hidden');
                 backgroundMusic.pause();
                 backgroundMusic.currentTime = 0;
-                passwordInput.value = '';
-                passwordInput.focus();
                 
-                imageStack.innerHTML = '';
+                imageGallery.innerHTML = '';
+                
+                // إعادة تعيين الأزرار
+                yesButtonSize = 1;
+                yesButton.style.transform = 'scale(1)';
+                yesButton.style.backgroundColor = '#4CAF50';
+                
+                noButton.style.transform = '';
+                noButton.style.opacity = '1';
+                noButton.style.pointerEvents = 'auto';
+                noButton.style.backgroundColor = '#ff4757';
+                noButton.textContent = 'لا';
+                noButton.classList.remove('moving');
+                
+                noClickCount = 0;
+                noButtonMoves = 0;
             }, 300);
         });
-        
-        // التحكم في الصور بالسحب
-        let dragStartX = 0;
-        let dragDistance = 0;
-        let isTouchDevice = 'ontouchstart' in window;
-        
-        if (isTouchDevice) {
-            imageGallery.addEventListener('touchstart', function(e) {
-                isUserInteracting = true;
-                stopAutoSlide();
-                dragStartX = e.touches[0].clientX;
-                dragDistance = 0;
-            });
-            
-            imageGallery.addEventListener('touchmove', function(e) {
-                dragDistance = e.touches[0].clientX - dragStartX;
-            });
-            
-            imageGallery.addEventListener('touchend', function() {
-                if (Math.abs(dragDistance) > 50) {
-                    if (dragDistance > 0) {
-                        changeImage(-1);
-                    } else {
-                        changeImage(1);
-                    }
-                }
-                dragDistance = 0;
-                
-                // إعادة التشغيل بعد ثانية
-                setTimeout(() => {
-                    isUserInteracting = false;
-                    startAutoSlide();
-                }, 1000);
-            });
-        } else {
-            imageGallery.addEventListener('mousedown', function(e) {
-                isUserInteracting = true;
-                stopAutoSlide();
-                dragStartX = e.clientX;
-                dragDistance = 0;
-                imageGallery.style.cursor = 'grabbing';
-            });
-            
-            imageGallery.addEventListener('mousemove', function(e) {
-                if (dragStartX !== 0) {
-                    dragDistance = e.clientX - dragStartX;
-                }
-            });
-            
-            imageGallery.addEventListener('mouseup', function() {
-                if (Math.abs(dragDistance) > 50) {
-                    if (dragDistance > 0) {
-                        changeImage(-1);
-                    } else {
-                        changeImage(1);
-                    }
-                }
-                dragStartX = 0;
-                dragDistance = 0;
-                imageGallery.style.cursor = 'grab';
-                
-                // إعادة التشغيل بعد ثانية
-                setTimeout(() => {
-                    isUserInteracting = false;
-                    startAutoSlide();
-                }, 1000);
-            });
-            
-            imageGallery.addEventListener('mouseleave', function() {
-                if (dragStartX !== 0) {
-                    isUserInteracting = false;
-                    startAutoSlide();
-                }
-                dragStartX = 0;
-                dragDistance = 0;
-                imageGallery.style.cursor = 'grab';
-            });
-            
-            // أسهم الكيبورد
-            document.addEventListener('keydown', function(e) {
-                if (gallerySection.classList.contains('active')) {
-                    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-                        isUserInteracting = true;
-                        stopAutoSlide();
-                        changeImage(1);
-                        
-                        setTimeout(() => {
-                            isUserInteracting = false;
-                            startAutoSlide();
-                        }, 1000);
-                    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-                        isUserInteracting = true;
-                        stopAutoSlide();
-                        changeImage(-1);
-                        
-                        setTimeout(() => {
-                            isUserInteracting = false;
-                            startAutoSlide();
-                        }, 1000);
-                    }
-                }
-            });
-        }
         
         // بدء تشغيل الخلفية
         window.addEventListener('DOMContentLoaded', () => {
             initHearts();
-            passwordInput.focus();
         });
         
         // تنظيف الموارد
         window.addEventListener('beforeunload', () => {
             clearInterval(heartsInterval);
-            stopAutoSlide();
             heartsBackground.innerHTML = '';
         });
     </script>
